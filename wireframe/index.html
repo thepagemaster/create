@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe Éditeur Reel</title>
+<style>
+:root{--bg:#f2f2f2;--ink:#222;--mid:#888;--line:#bbb;--box:#ddd;--box2:#c8c8c8;--acc:#555;--screen:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:13px/1.3 system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;gap:24px;padding:16px;justify-content:center;flex-wrap:wrap}
+nav{width:220px;display:flex;flex-direction:column;gap:4px}
+nav h1{font-size:15px;margin-bottom:6px}
+nav p{color:var(--mid);font-size:12px;margin-bottom:8px}
+nav button{text-align:left;padding:6px 8px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:4px}
+nav button.on{background:var(--ink);color:#fff}
+.phone{width:360px;height:760px;border:2px solid var(--ink);border-radius:28px;background:var(--screen);overflow:hidden;position:relative;flex-shrink:0}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.on{display:flex}
+.status{height:28px;font-size:11px;display:flex;justify-content:space-between;padding:8px 20px 0;color:var(--mid)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px}
+.btn{border:1px solid var(--ink);background:#fff;border-radius:16px;padding:5px 12px;cursor:pointer;font-size:12px}
+.btn.fill{background:var(--ink);color:#fff}
+.ic{width:28px;height:28px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:12px;background:#fff}
+.x{cursor:pointer;font-size:18px}
+.preview{margin:4px auto;width:170px;height:300px;background:var(--box);border:1px solid var(--line);position:relative;display:grid;place-items:center;color:var(--mid);font-size:11px}
+.preview.big{width:100%;height:360px;margin:0;border-left:0;border-right:0}
+.cap{position:absolute;left:0;right:0;text-align:center;font-weight:700;color:var(--ink);font-size:13px}
+.cap.t{top:30%;font-size:18px}.cap.m{top:55%}
+.ctrl{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;font-size:11px;color:var(--mid)}
+.timeline{position:relative;padding:6px 0 6px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);flex:1;overflow:hidden}
+.ruler{font-size:9px;color:var(--mid);display:flex;gap:42px;padding-left:30px;margin-bottom:4px}
+.track{height:24px;margin:3px 0;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:10px;cursor:pointer;white-space:nowrap;overflow:hidden}
+.track.v{background:repeating-linear-gradient(90deg,var(--box2) 0 28px,var(--box) 28px 30px);height:34px}
+.track.a{background:#e6e6e6;width:85%}
+.track.s{background:#efefef;width:40%;margin-left:30px}
+.track.sub{background:#f6f6f6;gap:3px;padding:0 2px}
+.track.sub span{border:1px solid var(--line);padding:1px 4px;border-radius:3px}
+.track.sel{outline:2px solid var(--ink)}
+.playhead{position:absolute;top:0;bottom:0;left:45%;width:2px;background:var(--ink)}
+.add{position:absolute;right:10px;top:26px}
+.tools{display:flex;justify-content:space-around;padding:8px 4px 18px;border-top:1px solid var(--line)}
+.tool{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;cursor:pointer;min-width:44px}
+.tool i{width:26px;height:26px;border:1px solid var(--ink);border-radius:6px;display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--ink);border-radius:16px 16px 0 0;padding:10px 12px 18px;display:flex;flex-direction:column;gap:8px}
+.grip{width:40px;height:4px;background:var(--line);border-radius:2px;margin:0 auto}
+.search{border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--mid);flex:1}
+.chips{display:flex;gap:6px;overflow:hidden}
+.chip{border:1px solid var(--line);border-radius:12px;padding:3px 10px;font-size:11px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #eee}
+.thumb{width:36px;height:36px;background:var(--box);border:1px solid var(--line);flex-shrink:0}
+.row .t b{display:block;font-size:12px}.row .t small{color:var(--mid);font-size:10px}
+.row .t{flex:1}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid div{aspect-ratio:9/14;background:var(--box);border:1px solid var(--line);font-size:9px;color:var(--mid);display:flex;align-items:flex-end;padding:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g2 div{border:1px solid var(--line);border-radius:6px;padding:9px;text-align:center;cursor:pointer;font-size:12px}
+.g2 div.on{border:2px solid var(--ink);font-weight:700}
+.kbd{background:#e9e9e9;padding:6px 4px 14px;display:flex;flex-direction:column;gap:5px}
+.kbd div{display:flex;justify-content:center;gap:4px}
+.kbd span{background:#fff;border-radius:4px;width:28px;height:30px;display:grid;place-items:center;font-size:12px;border:1px solid #ccc}
+.kbd span.w{width:150px}
+.ttabs{display:flex;justify-content:space-around;padding:6px;border-top:1px solid var(--line)}
+.ttabs span{width:30px;height:24px;border:1px solid var(--line);border-radius:5px;display:grid;place-items:center;cursor:pointer;font-size:11px}
+.ttabs span.on{background:var(--ink);color:#fff}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots i{width:20px;height:20px;border-radius:50%;border:1px solid var(--ink);display:block}
+.slider{height:6px;background:var(--box);border-radius:3px;position:relative;margin:8px 0}
+.slider:after{content:"";position:absolute;left:var(--p,50%);top:-5px;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
+.lbl{font-size:10px;color:var(--mid)}
+.modal{margin:auto 24px;border:2px solid var(--ink);border-radius:12px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:10px;background:#fff}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.15);display:flex}
+.note{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:var(--mid)}
+.wave{height:40px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px);opacity:.25;border-radius:4px}
+.spin{width:24px;height:24px;border:3px solid var(--box);border-top-color:var(--ink);border-radius:50%;margin:0 auto;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.hot{cursor:pointer}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <h1>Wireframe éditeur Reel</h1>
+  <p>Reconstitution basique du parcours vidéo. Cliquez les écrans ou les éléments du téléphone.</p>
+</nav>
+
+<div class="phone" id="phone">
+
+  <!-- 1. Brouillon -->
+  <section class="screen" data-name="1. Reprendre brouillon">
+    <div class="status"><span>13:10</span><span>●●●</span></div>
+    <div class="bar"><span class="x">✕</span><b>Nouveau reel</b><span class="ic">⚙</span></div>
+    <div class="chips" style="padding:0 12px"><span class="chip">Modifs</span><span class="chip">Modèles</span></div>
+    <div class="grid" style="padding:12px;opacity:.4"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div class="dim"><div class="modal">
+      <div class="thumb" style="width:60px;height:90px;margin:0 auto"></div>
+      <b>Poursuivre la modification de votre brouillon ?</b>
+      <small style="color:var(--mid)">Vous avez quitté avant d'enregistrer votre dernière vidéo.</small>
+      <button class="btn fill" data-go="editor">Continuer</button>
+      <button class="btn" data-go="picker">Commencer une nouvelle vidéo</button>
+    </div></div>
+  </section>
+
+  <!-- 2. Sélection média -->
+  <section class="screen" data-name="2. Choix des médias" data-id="picker">
+    <div class="status"><span>13:10</span><span>●●●</span></div>
+    <div class="bar"><span class="x" data-go="editor">✕</span><b>Nouveau reel</b><span></span></div>
+    <div class="bar"><b>Récentes ▾</b><span class="btn">Sélectionner</span></div>
+    <div class="grid" style="padding:0 2px">
+      <div>1:41</div><div>1:25</div><div>1:47</div><div>0:32</div><div>0:12</div><div>2:05</div><div>1:56</div><div>1:40</div><div>0:48</div><div>0:19</div><div>0:02</div><div>1:20</div>
+    </div>
+    <div class="chips" style="position:absolute;bottom:18px;left:12px;right:12px;justify-content:center">
+      <span class="chip">Publication</span><span class="chip">Story</span><span class="chip on">Reel</span><span class="chip">En direct</span>
+    </div>
+  </section>
+
+  <!-- 3. Éditeur principal -->
+  <section class="screen" data-name="3. Éditeur (timeline)" data-id="editor">
+    <div class="status"><span>13:12</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic fill hot" data-go="publish" style="background:var(--ink);color:#fff">→</span></div>
+    <div class="preview"><span>Aperçu vidéo 9:16</span><div class="cap t">Que fais-tu ?</div><div class="cap m">Quelqu'un essaie</div></div>
+    <div class="ctrl"><span>▶</span><span>0:07 / 2:05</span><span>↶ ↷</span></div>
+    <div class="timeline">
+      <div class="ruler"><span>0s</span><span>5s</span><span>10s</span><span>15s</span></div>
+      <div class="track v hot" data-go="clip">Clips vidéo</div>
+      <div class="track a hot" data-go="audioclip">♪ snowfall — artiste</div>
+      <div class="track s hot" data-go="text">T  Que fais-tu ?</div>
+      <div class="track sub hot" data-go="subs"><span>Tu le</span><span>L'hi</span><span>Il s</span><span>Il re</span><span>…</span></div>
+      <div class="playhead"></div>
+      <span class="ic add">+</span>
+    </div>
+    <div class="tools">
+      <div class="tool" data-go="audio"><i></i>Audio</div>
+      <div class="tool" data-go="text"><i></i>Texte</div>
+      <div class="tool" data-go="voice"><i></i>Voix</div>
+      <div class="tool" data-go="subs"><i></i>Sous-titres</div>
+      <div class="tool" data-go="overlay"><i></i>Superpos.</div>
+      <div class="tool" data-go="filter"><i></i>Filtre</div>
+    </div>
+  </section>
+
+  <!-- 4. Bibliothèque audio -->
+  <section class="screen" data-name="4. Ajouter audio" data-id="audio">
+    <div class="status"><span>13:11</span><span>●●●</span></div>
+    <div class="preview" style="height:200px;width:120px"><span>Aperçu</span></div>
+    <div class="sheet" style="top:270px">
+      <div class="grip"></div>
+      <div style="display:flex;gap:8px"><span class="search">🔍 Rechercher…</span><span class="btn">♪ Importer</span></div>
+      <div class="chips"><span class="chip on">Pour vous</span><span class="chip">Populaire</span><span class="chip">Audio d'origine</span><span class="chip">Enregistré</span><span class="chip">Libre de droits</span></div>
+      <div class="row"><div class="thumb" style="width:100%;height:48px;display:flex;align-items:center;padding:6px"><b>Titre mis en avant</b></div></div>
+      <div class="row hot" data-go="audiocut"><div class="thumb"></div><div class="t"><b>Netflix documentary</b><small>Artiste · 30 k reels · 1:07</small></div>☐</div>
+      <div class="row hot" data-go="audiocut"><div class="thumb"></div><div class="t"><b>snowfall</b><small>Artiste · 1,3 M reels · 2:05</small></div>☐</div>
+      <div class="row hot" data-go="audiocut"><div class="thumb"></div><div class="t"><b>The Hanging Tree</b><small>Artiste · 382 k reels · 3:39</small></div>☐</div>
+      <div class="row hot" data-go="audiocut"><div class="thumb"></div><div class="t"><b>Morceau 4</b><small>Artiste · 12 M reels · 0:58</small></div>☐</div>
+      <div class="row" style="background:#eee;padding:6px"><div class="thumb"></div><div class="t"><b>Lecture en cours</b></div>⏸ <span class="btn fill" data-go="audiocut">→</span></div>
+    </div>
+  </section>
+
+  <!-- 5. Choix section audio -->
+  <section class="screen" data-name="5. Choisir section audio" data-id="audiocut">
+    <div class="status"><span>13:11</span><span>●●●</span></div>
+    <div class="bar"><span class="hot" data-go="audio">Annuler</span><b>♪ Titre</b><span class="hot" data-go="editor"><b>Terminé</b></span></div>
+    <div class="preview big"><span>Aperçu</span><div class="cap m">Quelqu'un essaie</div></div>
+    <p style="text-align:center;color:var(--mid);margin:24px 0 10px">Choisissez la section à ajouter à votre reel</p>
+    <div style="margin:0 60px;border:2px solid var(--ink);border-radius:8px;padding:4px"><div class="wave"></div></div>
+  </section>
+
+  <!-- 6. Texte -->
+  <section class="screen" data-name="6. Texte : saisie" data-id="text">
+    <div class="status"><span>13:14</span><span>●●●</span></div>
+    <div class="bar"><span></span><span></span><b class="hot" data-go="editor">Terminé</b></div>
+    <div class="preview big" style="height:300px"><div class="cap t">La je peux modifier des sous-titres…|</div></div>
+    <div class="ttabs" id="ttabs">
+      <span class="on" data-go="text">⌨</span><span data-go="textstyle">▣</span><span data-go="textfont">Aa</span><span data-go="textcolor">◐</span><span data-go="textanim">A</span><span>≡</span>
+    </div>
+    <div class="kbd">
+      <div><span>a</span><span>z</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span></div>
+      <div><span>q</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span><span>m</span></div>
+      <div><span>⇧</span><span>w</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>'</span><span>⌫</span></div>
+      <div><span>123</span><span class="w"></span><span>↵</span></div>
+    </div>
+  </section>
+
+  <!-- 7. Texte styles prédéfinis -->
+  <section class="screen" data-name="7. Texte : styles" data-id="textstyle">
+    <div class="status"><span>13:14</span><span>●●●</span></div>
+    <div class="bar"><span></span><span></span><b class="hot" data-go="editor">Terminé</b></div>
+    <div class="preview big" style="height:300px"><div class="cap t">PICK A STYLE</div></div>
+    <div class="ttabs"><span data-go="text">⌨</span><span class="on">▣</span><span data-go="textfont">Aa</span><span data-go="textcolor">◐</span><span data-go="textanim">A</span><span>≡</span></div>
+    <div class="g2" style="padding:10px">
+      <div>Aucun</div><div class="on">Pick a style</div><div>PICK</div><div><u>Pick a style</u></div><div style="background:#333;color:#fff">PICK A STYLE</div><div><i>Pick</i></div><div style="font-family:monospace">Pick a style</div><div><b>Pick a style</b></div>
+    </div>
+  </section>
+
+  <!-- 8. Texte polices -->
+  <section class="screen" data-name="8. Texte : police" data-id="textfont">
+    <div class="status"><span>13:15</span><span>●●●</span></div>
+    <div class="bar"><span></span><span></span><b class="hot" data-go="editor">Terminé</b></div>
+    <div class="preview big" style="height:300px"><div class="cap t" style="text-transform:uppercase">La je peux modifier des sous-titres</div></div>
+    <div class="ttabs"><span data-go="text">⌨</span><span data-go="textstyle">▣</span><span class="on">Aa</span><span data-go="textcolor">◐</span><span data-go="textanim">A</span><span>≡</span></div>
+    <div class="g2" style="padding:10px">
+      <div>Classic</div><div>Modern</div><div><i>Signature</i></div><div style="font-family:monospace">Editor</div><div><b>Poster</b></div><div>Bubble</div><div>Deco</div><div><b>SQUEEZE</b></div><div style="font-family:monospace">Typewriter</div><div><b><i>Strong</i></b></div><div>Meme</div><div class="on">DIRECTIONAL</div>
+    </div>
+  </section>
+
+  <!-- 9. Texte couleur -->
+  <section class="screen" data-name="9. Texte : couleur" data-id="textcolor">
+    <div class="status"><span>13:15</span><span>●●●</span></div>
+    <div class="bar"><span></span><span></span><b class="hot" data-go="editor">Terminé</b></div>
+    <div class="preview big" style="height:300px"><div class="cap t" style="text-transform:uppercase;color:#777">La je peux modifier des sous-titres</div></div>
+    <div class="ttabs"><span data-go="text">⌨</span><span data-go="textstyle">▣</span><span data-go="textfont">Aa</span><span class="on">◐</span><span data-go="textanim">A</span><span>≡</span></div>
+    <div style="padding:12px">
+      <div class="dots"><i></i><i style="background:#fff"></i><i style="background:#000"></i><i style="background:#aaa"></i><i style="background:#ccc"></i><i style="background:#777"></i><i style="background:#555"></i><i style="background:#999"></i><i style="background:#ddd"></i></div>
+      <p class="lbl" style="margin-top:12px">Teinte</p><div class="slider" style="--p:80%"></div>
+      <p class="lbl">Saturation</p><div class="slider" style="--p:40%"></div>
+      <p class="lbl">Luminosité</p><div class="slider" style="--p:95%"></div>
+    </div>
+  </section>
+
+  <!-- 10. Texte animation -->
+  <section class="screen" data-name="10. Texte : animation" data-id="textanim">
+    <div class="status"><span>13:18</span><span>●●●</span></div>
+    <div class="bar"><span></span><span></span><b class="hot" data-go="editor">Terminé</b></div>
+    <div class="preview big" style="height:300px"><div class="cap t">Que fais-tu ?</div></div>
+    <div class="ttabs"><span data-go="text">⌨</span><span data-go="textstyle">▣</span><span data-go="textfont">Aa</span><span data-go="textcolor">◐</span><span class="on">A</span><span>≡</span></div>
+    <div class="g2" style="padding:10px">
+      <div>Aucun</div><div class="on">Hard Shadow</div><div>Block Offset</div><div>Neon</div><div>Halo</div><div>Shimmer</div><div>Digital</div><div>Dreamy</div><div>Pixel</div><div>Sparkle</div><div>3D Offset</div><div>Stop Motion</div>
+    </div>
+  </section>
+
+  <!-- 11. Clip sélectionné -->
+  <section class="screen" data-name="11. Clip sélectionné" data-id="clip">
+    <div class="status"><span>13:16</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic" style="background:var(--ink);color:#fff">→</span></div>
+    <div class="preview"><span>Aperçu</span><div class="cap t">Que fais-tu ?</div></div>
+    <div class="ctrl"><span>▶</span><span>0:07 / 2:05</span><span>↶ ↷</span></div>
+    <div class="timeline">
+      <div class="ruler"><span>0s</span><span>5s</span><span>10s</span><span>15s</span></div>
+      <div class="track v sel">▌ Clips vidéo ▐</div>
+      <div class="track a">♪ snowfall — artiste</div>
+      <div class="track s">T  Que fais-tu ?</div>
+      <div class="playhead"></div>
+    </div>
+    <div class="tools">
+      <div class="tool" data-go="editor">‹</div>
+      <div class="tool"><i></i>Diviser</div>
+      <div class="tool"><i></i>Remplacer</div>
+      <div class="tool" data-go="speed"><i></i>Vitesse</div>
+      <div class="tool" data-go="adjust"><i></i>Réglages</div>
+      <div class="tool"><i></i>Supprimer</div>
+    </div>
+  </section>
+
+  <!-- 12. Audio sélectionné -->
+  <section class="screen" data-name="12. Piste audio sélectionnée" data-id="audioclip">
+    <div class="status"><span>13:12</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic" style="background:var(--ink);color:#fff">→</span></div>
+    <div class="preview"><span>Aperçu</span><div class="cap m">Quelqu'un essaie</div></div>
+    <div class="ctrl"><span>▶</span><span>0:00 / 2:05</span><span>↶ ↷</span></div>
+    <div class="timeline">
+      <div class="ruler"><span>0s</span><span>5s</span><span>10s</span><span>15s</span></div>
+      <div class="track v">Clips vidéo</div>
+      <div class="track a sel">▌ ♪ snowfall — artiste ▐</div>
+      <div class="track s">T  Que fais-tu ?</div>
+      <div class="playhead"></div>
+    </div>
+    <div class="tools">
+      <div class="tool" data-go="editor">‹</div>
+      <div class="tool"><i></i>Diviser</div>
+      <div class="tool" data-go="audio"><i></i>Remplacer</div>
+      <div class="tool" data-go="volume"><i></i>Volume</div>
+      <div class="tool" data-go="fade"><i></i>Fondu</div>
+      <div class="tool" data-go="rhythm"><i></i>Rythmes</div>
+      <div class="tool"><i></i>Suppr.</div>
+    </div>
+  </section>
+
+  <!-- 13. Fondu -->
+  <section class="screen" data-name="13. Fondu audio" data-id="fade">
+    <div class="status"><span>13:12</span><span>●●●</span></div>
+    <div class="preview" style="margin-top:40px"><span>Aperçu</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="row"><div class="t"><b>Fondu d'ouverture</b></div><div style="flex:2" class="slider"></div><span>36,7 s</span></div>
+      <div class="row"><div class="t"><b>Fondu de fermeture</b></div><div style="flex:2;--p:0%" class="slider"></div><span>0,0 s</span></div>
+      <div class="bar"><span class="hot" data-go="audioclip">Annuler</span><b>Fondu</b><b class="hot" data-go="audioclip">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 14. Volume -->
+  <section class="screen" data-name="14. Volume / voix" data-id="volume">
+    <div class="status"><span>13:16</span><span>●●●</span></div>
+    <div class="preview" style="margin-top:40px"><span>Aperçu</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <b>Optimisation de la voix</b>
+      <small class="lbl">Réduit le bruit de fond et améliore la qualité audio.</small>
+      <div class="slider" style="--p:40%"></div>
+      <div class="bar"><span class="hot" data-go="audioclip">Annuler</span><b>Volume</b><b class="hot" data-go="audioclip">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 15. Rythme -->
+  <section class="screen" data-name="15. Rythme (beats)" data-id="rhythm">
+    <div class="status"><span>13:13</span><span>●●●</span></div>
+    <div class="preview" style="margin-top:40px"><span>Aperçu</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div style="display:flex;gap:8px;align-items:center">▶<div class="wave" style="flex:1"></div></div>
+      <p style="text-align:center">Supprimer</p>
+      <p class="lbl">Générer le rythme</p>
+      <div class="chips" style="justify-content:space-around"><span class="chip">Désactivé</span><span class="chip on">Moins</span><span class="chip">Plus</span></div>
+      <div class="bar"><span>Réinitialiser</span><b>Rythme</b><b class="hot" data-go="audioclip">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 16. Réglages clip -->
+  <section class="screen" data-name="16. Réglages image" data-id="adjust">
+    <div class="status"><span>13:16</span><span>●●●</span></div>
+    <div class="preview" style="margin-top:40px"><span>Aperçu</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <b style="text-align:center">Contraste</b>
+      <div style="display:flex;justify-content:space-around"><span class="ic">☀</span><span class="ic on" style="border:2px solid var(--ink)">◑</span><span class="ic">🌡</span><span class="ic">💧</span><span class="ic">◐</span><span class="ic">◌</span></div>
+      <div class="wave" style="height:24px"></div>
+      <div class="bar"><span class="hot" data-go="clip">Annuler</span><b>Réglages</b><b class="hot" data-go="clip">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 17. Vitesse -->
+  <section class="screen" data-name="17. Vitesse" data-id="speed">
+    <div class="status"><span>13:16</span><span>●●●</span></div>
+    <div class="preview" style="margin-top:40px"><span>Aperçu</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="chips" style="justify-content:space-around"><span class="chip">0,5×</span><span class="chip on">1×</span><span class="chip">1,5×</span><span class="chip">2×</span><span class="chip">3×</span></div>
+      <div class="bar"><span class="hot" data-go="clip">Annuler</span><b>Vitesse</b><b class="hot" data-go="clip">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 18. Sous-titres -->
+  <section class="screen" data-name="18. Sous-titres auto" data-id="subs">
+    <div class="status"><span>13:14</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic">→</span></div>
+    <div class="preview"><div class="cap m">Tour de</div></div>
+    <div class="timeline" style="opacity:.4">
+      <div class="track v">Clips vidéo</div><div class="track a">♪ Audio</div>
+    </div>
+    <div class="dim" style="background:rgba(255,255,255,.4)"><div class="modal" style="margin-top:auto;margin-bottom:200px">
+      <div class="spin"></div><b>Génération des sous-titres…</b>
+      <button class="btn" data-go="editor">Annuler</button>
+      <button class="btn fill" data-go="text">Modifier le texte →</button>
+    </div></div>
+  </section>
+
+  <!-- 19. Voix off -->
+  <section class="screen" data-name="19. Voix off" data-id="voice">
+    <div class="status"><span>13:16</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic">→</span></div>
+    <div class="preview"><span>Aperçu</span></div>
+    <div class="ctrl"><span>⏸</span><span>0:10 / 2:05</span><span>↶ ↷</span></div>
+    <div class="timeline">
+      <div class="track v">Clips vidéo</div>
+      <div class="track a">♪ snowfall</div>
+      <div class="track s" style="background:#ddd">● Voix off 1 (enregistrement)</div>
+      <div class="playhead"></div>
+    </div>
+    <div style="display:flex;justify-content:center;padding:14px 0 22px;border-top:1px solid var(--line)">
+      <span class="hot" data-go="editor" style="width:56px;height:56px;border-radius:50%;border:4px solid var(--ink);display:grid;place-items:center">■</span>
+    </div>
+  </section>
+
+  <!-- 20. Superposition -->
+  <section class="screen" data-name="20. Superposition" data-id="overlay">
+    <div class="status"><span>13:17</span><span>●●●</span></div>
+    <div class="bar"><span class="x" data-go="editor">✕</span><b>Ajouter comme superposition</b><span></span></div>
+    <div class="bar"><b>Récentes ▾</b><span class="lbl">Gérer</span></div>
+    <div class="grid" style="padding:0 2px">
+      <div data-go="editor" class="hot">1:20</div><div>1:25</div><div>0:48</div><div>0:02</div><div>0:19</div><div></div><div></div><div></div><div></div>
+    </div>
+  </section>
+
+  <!-- 21. Filtre -->
+  <section class="screen" data-name="21. Filtre" data-id="filter">
+    <div class="status"><span>13:18</span><span>●●●</span></div>
+    <div class="bar"><span class="ic">⌃</span><span class="btn">Tester Edits</span><span class="ic">→</span></div>
+    <div class="preview"><span>Aperçu filtré</span></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="chips" style="gap:8px">
+        <div style="text-align:center"><div class="thumb" style="width:52px;height:70px;border:2px solid var(--ink)"></div><small>Normal</small></div>
+        <div style="text-align:center"><div class="thumb" style="width:52px;height:70px"></div><small>Paris</small></div>
+        <div style="text-align:center"><div class="thumb" style="width:52px;height:70px"></div><small>Los Angeles</small></div>
+        <div style="text-align:center"><div class="thumb" style="width:52px;height:70px"></div><small>Oslo</small></div>
+        <div style="text-align:center"><div class="thumb" style="width:52px;height:70px"></div><small>…</small></div>
+      </div>
+      <div class="bar"><span class="hot" data-go="editor">Annuler</span><b>Filtre</b><b class="hot" data-go="editor">Terminé</b></div>
+    </div>
+  </section>
+
+  <!-- 22. Publication -->
+  <section class="screen" data-name="22. Publication" data-id="publish">
+    <div class="status"><span>13:10</span><span>●●●</span></div>
+    <div class="bar"><span class="x" data-go="editor">‹</span><b>Nouveau reel</b><span></span></div>
+    <div style="display:flex;gap:10px;padding:12px"><div class="thumb" style="width:80px;height:130px"></div><div class="search" style="height:130px">Ajouter une légende…</div></div>
+    <div class="row" style="padding:12px">Couverture</div>
+    <div class="row" style="padding:12px">Identifier des personnes</div>
+    <div class="row" style="padding:12px">Ajouter un lieu</div>
+    <div class="row" style="padding:12px">Audience</div>
+    <div style="margin-top:auto;padding:16px;display:flex;gap:8px"><button class="btn" style="flex:1">Brouillon</button><button class="btn fill" style="flex:1">Partager</button></div>
+  </section>
+</div>
+
+<script>
+const screens=[...document.querySelectorAll('.screen')];
+const nav=document.getElementById('nav');
+screens.forEach((s,i)=>{ if(!s.dataset.id) s.dataset.id='s'+i;
+  const b=document.createElement('button'); b.textContent=s.dataset.name; b.onclick=()=>show(s.dataset.id); nav.appendChild(b); s._b=b; });
+function show(id){ screens.forEach(s=>{const on=s.dataset.id===id; s.classList.toggle('on',on); s._b.classList.toggle('on',on);}); }
+document.getElementById('phone').addEventListener('click',e=>{const t=e.target.closest('[data-go]'); if(t) show(t.dataset.go);});
+show(screens[0].dataset.id);
+</script>
+</body>
+</html>
